@@ -1,0 +1,6 @@
+D:\Sort_Algorithm\Sort_Algorithm\bin\Debug\Sort_Algorithm.exe.config
+D:\Sort_Algorithm\Sort_Algorithm\bin\Debug\Sort_Algorithm.exe
+D:\Sort_Algorithm\Sort_Algorithm\bin\Debug\Sort_Algorithm.pdb
+D:\Sort_Algorithm\Sort_Algorithm\obj\Debug\Sort_Algorithm.csprojResolveAssemblyReference.cache
+D:\Sort_Algorithm\Sort_Algorithm\obj\Debug\Sort_Algorithm.exe
+D:\Sort_Algorithm\Sort_Algorithm\obj\Debug\Sort_Algorithm.pdb
