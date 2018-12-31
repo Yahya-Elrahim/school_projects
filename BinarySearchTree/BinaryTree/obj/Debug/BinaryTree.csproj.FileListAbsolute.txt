@@ -1,0 +1,6 @@
+C:\Users\rhyah\OneDrive\Belgeler\Visual Studio 2013\Projects\BinaryTree\BinaryTree\bin\Debug\BinaryTree.exe.config
+C:\Users\rhyah\OneDrive\Belgeler\Visual Studio 2013\Projects\BinaryTree\BinaryTree\bin\Debug\BinaryTree.exe
+C:\Users\rhyah\OneDrive\Belgeler\Visual Studio 2013\Projects\BinaryTree\BinaryTree\bin\Debug\BinaryTree.pdb
+C:\Users\rhyah\OneDrive\Belgeler\Visual Studio 2013\Projects\BinaryTree\BinaryTree\obj\Debug\BinaryTree.csprojResolveAssemblyReference.cache
+C:\Users\rhyah\OneDrive\Belgeler\Visual Studio 2013\Projects\BinaryTree\BinaryTree\obj\Debug\BinaryTree.exe
+C:\Users\rhyah\OneDrive\Belgeler\Visual Studio 2013\Projects\BinaryTree\BinaryTree\obj\Debug\BinaryTree.pdb
