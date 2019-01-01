@@ -1,0 +1,6 @@
+C:\Users\rhyah\OneDrive\Belgeler\Visual Studio 2013\Projects\Max_Mini_InBST\Max_Mini_InBST\bin\Debug\Max_Mini_InBST.exe.config
+C:\Users\rhyah\OneDrive\Belgeler\Visual Studio 2013\Projects\Max_Mini_InBST\Max_Mini_InBST\bin\Debug\Max_Mini_InBST.exe
+C:\Users\rhyah\OneDrive\Belgeler\Visual Studio 2013\Projects\Max_Mini_InBST\Max_Mini_InBST\bin\Debug\Max_Mini_InBST.pdb
+C:\Users\rhyah\OneDrive\Belgeler\Visual Studio 2013\Projects\Max_Mini_InBST\Max_Mini_InBST\obj\Debug\Max_Mini_InBST.csprojResolveAssemblyReference.cache
+C:\Users\rhyah\OneDrive\Belgeler\Visual Studio 2013\Projects\Max_Mini_InBST\Max_Mini_InBST\obj\Debug\Max_Mini_InBST.exe
+C:\Users\rhyah\OneDrive\Belgeler\Visual Studio 2013\Projects\Max_Mini_InBST\Max_Mini_InBST\obj\Debug\Max_Mini_InBST.pdb
