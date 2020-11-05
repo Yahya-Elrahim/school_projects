@@ -6,7 +6,8 @@ public class Main {
 
  
     public static void main(String[] args) {
-        
+        // MyUtils class'ında metotla static olarak tanımlandığından
+        // nesne oluşturmaya gerek kalmadan sınıf üzerinden çağirabliliriz.
         float trianglePerimeter = MyUtils.trianglePerimeter(3, 3, 3);
         System.out.print("The perimeter of the triangle is: " + trianglePerimeter + "\n");
         
