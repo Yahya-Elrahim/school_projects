@@ -1,0 +1,561 @@
+
+package neuralnetwork;
+
+
+
+ abstract class Normalizer{
+    
+    abstract Matrix normalize(Matrix matrix, String type);
+}
+
+class Normalization extends Normalizer{
+    
+    public static final String MIN_MAX = "min_max";
+    public static final String ZSKORE = "zskore";
+    
+    private Matrix matrix;
+
+    public Normalization() {
+    }
+    
+    
+    @Override
+    public Matrix normalize(Matrix matrix, String type){
+        this.matrix = matrix;
+        if (type.equals(MIN_MAX)){
+           return minmaxNormalizer();
+        }else{
+            return zskoreNormalizer();
+        }
+        
+    }
+    
+    private Matrix minmaxNormalizer(){
+       Matrix m = new Matrix(this.matrix.rows, this.matrix.cols);
+        for (int i = 0; i < matrix.cols; i++) {
+            minmax(m, i);
+            System.out.println("-------------");
+        }
+         printMatrix(m.getData());
+        return m;
+    }
+    private void minmax(Matrix m, int index){
+      
+        double [] temp = new double[this.matrix.rows];
+        double [] column = matrix.getColumn(index);
+        if (!isNeedNormalization(column)){
+            m.setColumn(column, index);
+            return;
+        }
+        double minmaxns [] = findMinmax(column);
+        for (int i = 0; i < this.matrix.rows; i++) {
+            temp[i] = getNormalizedNumber(column[i], minmaxns[0], minmaxns[1]);
+        }
+        
+        m.setColumn(temp, index);
+    }
+    
+    private double[] findMinmax(double[] column) {
+       double min = column[0], max = 0;
+        for (int i = 0; i < column.length; i++) {
+            if (column[i] > max)
+                max = column[i];
+            if (column[i] < min)
+                min = column[i];
+        }
+        System.out.println("Max number : " + max);
+        System.out.println("Min number : " + min);
+        return (new double[]{min, max});
+    }
+    
+    private double getNormalizedNumber(double n, double min, double max){
+        System.out.println(n + " - " + min + " /" + max + " - " + min + " = " + (n - min) / (max - min));
+        return (n - min) / (max - min);
+    }
+    private boolean isNeedNormalization(double [] column){
+        int oneCounter = 0, other = 0;
+        for (int i = 0; i < column.length; i++) {
+            if(column[i] <= 1)
+                oneCounter ++;
+            else
+                other ++;
+        }
+        
+        return oneCounter < other;
+    }
+    
+    
+    private Matrix zskoreNormalizer(){
+        Matrix normalizedMatrix = new Matrix(this.matrix.rows, this.matrix.cols);
+        for (int i = 0; i < matrix.cols; i++) {
+            zskor(normalizedMatrix, i);
+            System.out.println("-------------");
+        }
+        printMatrix(normalizedMatrix.getData());
+        
+        return normalizedMatrix;
+    }
+
+       private void zskor(Matrix m, int index){
+      
+        double [] temp = new double[this.matrix.rows];
+        double [] column = matrix.getColumn(index);
+        if (!isNeedNormalization(column)){
+            m.setColumn(column, index);
+            return;
+        }
+        double mean = getMean(column);
+        double sigma = getStandardDeviation(column);
+        System.out.println("Sigma : " + sigma);
+        System.out.println("Mean : "+mean );
+        
+        for (int i = 0; i < column.length; i++) {
+            temp[i] = getZScoreNormalizedNumner(column[i], mean, sigma);
+         }
+        
+        
+        m.setColumn(temp, index);
+    }
+       
+    private double getZScoreNormalizedNumner(double n, double mean, double sigma){
+        System.out.println(format(n) + " - " + mean + " /" + sigma + " = " + (n - mean) / sigma);
+        return (n - mean) / sigma;
+    }
+    
+     public  double getMean(double[] arr) {    
+        double mean = 0;
+        for (int i = 0; i < arr.length; i++)
+            mean += arr[i];
+        mean /= arr.length;
+
+        return mean;
+    }
+
+    public double getStandardDeviation(double[] arr) {
+        int N = arr.length;
+        double mean = getMean(arr);
+        double sigma = 0;
+
+        for (int i = 0; i < N; i++)
+            sigma += Math.pow(arr[i] - mean, 2.0);
+        sigma /= N;
+        sigma = Math.sqrt(sigma);
+
+        return sigma;
+    }
+ 
+
+      private String format(double val){
+        return String.format("%.2f", val);
+    } 
+    private void printMatrix(double [][] data){
+        for (int i = 0; i < this.matrix.rows; i++) {
+            for (int j = 0; j < this.matrix.cols; j++) {
+                System.out.print(format(data[i][j]) + " ");
+            }
+            System.out.println("");
+            
+        }
+    }
+}
+
+ class Matrix {
+    
+    public int rows;
+    public int cols;
+    
+    private double [][] data;
+    private double [][] hidenLayerData;
+    private double [] activationLayer;
+    private double [] yHot;
+    private double [] newWeight;
+
+    public Matrix(int rows, int cols) {
+        this.cols= cols;
+        this.rows = rows;
+        this.data = new double[rows][cols];
+        this.hidenLayerData = new double[rows][cols];
+        this.activationLayer = new double[this.rows];
+        this.yHot = new double[this.rows];
+        this.newWeight = new double[this.rows];
+    }
+
+    
+    public Matrix(double[][] data) {
+        this.rows = data.length;
+        this.cols = data[0].length;
+        this.data = data;
+        
+    }
+
+    public double[][] getData() {
+        return data;
+    }
+    
+    
+    public double[] getColumn(int index){
+        double [] arr = new double[rows];
+        for (int i = 0; i < rows; i++) {
+            arr[i] = data[i][index];
+            
+        }
+        return arr;
+    }
+    
+    public void setColumn(double[] col, int index){
+        for (int i = 0; i < rows; i++) {
+            this.data[i][index] = col[i];
+            
+        }
+    }
+
+    public double[][] gethidenLayerData() {
+        return hidenLayerData;
+    }
+
+    public void sethidenLayerData(double[][] hidenLayerData) {
+        this.hidenLayerData = hidenLayerData;
+    }
+
+    public double[] getactivationLayerdata() {
+        return activationLayer;
+    }
+
+    public void setactivationLayerData(double[] activationLayer) {
+        this.activationLayer = activationLayer;
+    }
+
+    public double[] getyHot() {
+        return yHot;
+    }
+
+    public void setyHot(double[] yHot) {
+        this.yHot = yHot;
+    }
+
+    public double[] getNewWeight() {
+        return newWeight;
+    }
+
+    public void setNewWeight(double[] newWeight) {
+        this.newWeight = newWeight;
+    }
+    
+
+    
+    
+}
+  class ActivationFuctions{
+    public static final String NONE = "none";
+    public static final String SIGMOID = "sigmoid";
+    public static final String RELU = "relu";
+    public static final String TANH = "tanh";
+    public static final String SOFTMAX = "softmax";
+}
+class LossFunctions{
+    public static final String MBE = "mbe";
+    public static final String MAE = "mae";
+    public static final String MSE = "mse";
+    public static final String RMSE= "RMSE";
+    public static final String MAPE = "mape";
+}
+public class NeuralNetwork {
+    
+    private double [] weights;
+    private Matrix matrix;
+    private String activationFunction;
+    
+    public void multiplyFeatures(Matrix matrix, double [] weights, String activation){
+        this.weights = weights;
+        this.matrix = matrix;
+        this.activationFunction = activation;
+        doMultiplication();
+        print();
+    }
+    
+    
+    private void doMultiplication() {
+        double sum = 0;
+        double [][] temp = new double[this.matrix.rows][this.matrix.cols];
+        double [][] matrixData = this.matrix.getData();
+        double [] sumArr = new double[this.matrix.rows];
+        
+        for (int i = 0; i < this.matrix.rows; i++) {
+            for (int j = 0; j < this.matrix.cols - 1; j++) {
+                temp[i][j] =  multiply(matrixData[i][j], j);
+                System.out.print(" --  " + temp[i][j]);
+                sum += temp[i][j];
+            }  
+            System.out.println("");
+            sumArr[i] = sum;
+            sum = 0;
+        }
+        this.matrix.sethidenLayerData(temp);
+        this.matrix.setyHot(sumArr);
+        
+        switch (activationFunction) {
+            case ActivationFuctions.NONE:
+                return;
+            case ActivationFuctions.SIGMOID:
+                this.matrix.setactivationLayerData(sigmoid(sumArr));
+                break;
+            case ActivationFuctions.RELU:
+                this.matrix.setactivationLayerData(reLu(sumArr));
+                break;
+            case ActivationFuctions.TANH:
+                this.matrix.setactivationLayerData(tanh(sumArr));
+                break;
+            case ActivationFuctions.SOFTMAX:
+                this.matrix.setactivationLayerData(softmax(sumArr));
+                break;  
+        }
+    }
+    
+    private double multiply(double n, int i){
+        return  n * this.weights[i];
+    }
+    
+    private double [] sigmoid(double [] data){
+        double [] result = new double[data.length];
+        for (int i = 0; i < data.length; i++) {
+            result[i] = calculateSigmoid(data[i]);
+        }
+        return result;
+    }
+    private double calculateSigmoid(double n){
+        return n < 0 ? 0 : 1;
+    }
+    
+     private double [] reLu(double [] data){
+        double [] result = new double[data.length];
+        for (int i = 0; i < data.length; i++) {
+            result[i] = calculateReLu(data[i]);
+        }
+        return result;
+    }
+    private double calculateReLu(double n){
+        double r = (1 / (1 + Math.exp(-n)));
+        return r <= 0 ? 0 : r;
+    }
+    
+    private double [] tanh(double [] neuronValues){
+        double [] result = new double[neuronValues.length];
+        for (int i = 0; i < neuronValues.length; i++) {
+            result[i] = calculateTanh(neuronValues[i]);
+        }
+        return result;
+    }
+    private double calculateTanh(double n){
+        return Math.tanh(n);
+    }
+    
+      private double [] softmax(double [] data){
+        double [] result = new double[data.length];
+        for (int i = 0; i < data.length; i++) {
+            result[i] = Math.exp(data[i]);
+        }
+        double dom = this.getSummation(result); // sum of e^x
+        for (int i = 0; i < data.length; i++) {
+            result[i] = result[i] / dom;
+        }
+        return result;
+    }
+      
+    private double [] mbe(){
+        double[] sub = getSubtraction();
+        System.out.println("MBE = " + getSummation(sub) / matrix.rows);
+        return sub;
+    }
+    
+    private double [] mae(){
+       double [] sub = getSubtraction();
+       double [] arr = new double[sub.length];
+       for (int i = 0; i < sub.length; i++) {
+           arr[i] = Math.abs(sub[i]);    
+       }
+       System.out.println("MAE =  " + getSummation(arr) / matrix.rows);
+       return arr;
+    }
+    
+     private double [] mse(){
+       double [] sub = getSubtraction();
+       double [] arr = new double[sub.length];
+       for (int i = 0; i < sub.length - 1; i++) {
+           arr[i] = Math.pow(sub[i], 2);    
+       }
+         System.out.println("MSE = " + getSummation(arr) / (matrix.rows - 1));
+       return arr;
+    }
+    
+     private double[] rmse(){
+       double [] sub = getSubtraction();
+       double [] arr = new double[sub.length];
+       for (int i = 0; i < sub.length; i++) {
+           arr[i] = Math.pow(sub[i], 2);    
+       }
+       System.out.println("RMSE = " + Math.sqrt(getSummation(arr) / matrix.rows));
+       return arr;
+    }
+    
+    private double[] mape(){
+       double [] y = this.matrix.getColumn(this.matrix.cols - 1);
+       double [] sub = getSubtraction();
+       double [] arr = new double[sub.length];
+       for (int i = 0; i < sub.length; i++) {
+           arr[i] = Math.abs(sub[i])/y[i];    
+       }
+        System.out.println("MAPE =  " + (100 / matrix.rows) * getSummation(arr));
+       return arr;
+    }
+    
+    private double getSummation(double [] data){
+        double sum = 0;
+        for (int i = 0; i < data.length; i++) {
+            sum += data[i];
+        }
+        System.out.println("Sum = " + format(sum));
+        return sum;
+    }
+    
+     private double [] getSubtraction(){
+        
+        double [] y = this.matrix.getColumn(this.matrix.cols - 1);
+        double [] yHot = this.matrix.getyHot();
+        double [] result = new double[yHot.length];
+         System.out.println("y - y'");
+        for (int i = 0; i < yHot.length - 1; i++) {
+            result[i] = y[i] - yHot[i]; 
+            System.out.println(format(y[i]) + " - " + format(yHot[i]) + " = " + format(result[i]));
+        }
+        return result;
+    }
+    private String format(double val){
+        return String.format("%.5f", val);
+    } 
+  
+     public void backpropagation(String lossFunction, double learingRate){
+         
+         double [] yyHot = null;
+         switch(lossFunction){
+             case LossFunctions.MAE:
+                yyHot = mae();
+                 break;
+            case LossFunctions.MAPE:
+                yyHot = mape();
+                break;
+            case LossFunctions.MBE:
+                yyHot = mbe();
+                break;
+            case LossFunctions.MSE:
+                yyHot = mse();
+                break;
+            case LossFunctions.RMSE:
+                yyHot = rmse();
+                break;
+           
+         }
+        double [][] hiddenLayerData = this.matrix.gethidenLayerData();
+        double [][] updatedData = new double[matrix.rows][matrix.cols];
+        double [] updatedWeights = new double[matrix.cols];
+        double sum = 0;
+        
+        for (int i = 0; i < matrix.rows -1; i++) {
+             for (int j = 0; j < matrix.cols; j++) {
+                updatedData[i][j] = hiddenLayerData[i][j] * yyHot[i];
+                 System.out.print(updatedData[i][j]+" ** ");
+            }
+             System.out.println("");
+        }
+        
+         for (int i = 0; i < matrix.cols; i++) {
+             for (int j = 0; j < matrix.rows; j++) {
+                 sum += updatedData[j][i];
+             }
+             updatedWeights[i] = sum;
+             sum = 0;
+         }
+         
+         double [] nw = new double[matrix.rows];
+         for (int i = 0; i < matrix.cols - 1; i++) {
+             double newWeight = this.weights[i] - updatedWeights[i] * learingRate;
+             nw[i] = newWeight;
+             System.out.println(weights[i] + " - " + updatedWeights[i] + " * " + learingRate);
+             System.out.println();
+             System.out.println("W" + i + " = " + newWeight);
+         }
+         this.matrix.setNewWeight(nw);
+    }
+   
+    private void print(){
+        double [][] data = this.matrix.gethidenLayerData();
+        double [] activation = this.matrix.getactivationLayerdata();
+        double [] yHot = this.matrix.getyHot();
+        for (int i = 0; i < this.matrix.rows; i++) {
+            for (int j = 0; j < this.matrix.cols; j++) {
+                System.out.print( format(data[i][j]) + " ");
+                
+            }
+            System.out.println("y' = " + yHot[i]);
+            System.out.println(this.activationFunction + " " + activation[i]);
+        }
+    }
+    
+    public void totalErorr(){
+        double bias = getSummation(getSubtraction());
+        
+        double [] yHot = this.matrix.getyHot();
+        
+        double yHotMean = (getSummation(yHot) / this.matrix.rows);
+        
+        double variance = 0;
+        for (int i = 0; i < matrix.rows; i++) {
+            variance += Math.pow((yHot[i] - yHotMean), 2);
+        }
+        
+        double irreducibleError = variance;
+        System.out.println("irreducibleError : " + irreducibleError);
+        
+        variance /= this.matrix.rows;
+        System.out.println("variance : " + variance);
+        
+        System.out.println("Bias : " + bias);
+        double totalError = Math.pow(bias, 2) + variance + irreducibleError;
+        
+        System.out.println("Total Error : " + totalError);
+    }
+    
+    
+    public static void main(String[] args) {
+        
+        
+    double [][] input = new double[][]{
+        {1, 300, 100, 2},
+        {1, 400, 200, 4},
+        {1, 200, 500, 1},
+        {1, 100, 300, 5},
+        {1, 500, 400, 3}};
+    
+    double [] weights = new double[]{0.1, 0.1, 0.2};
+    
+    Matrix matrix = new Matrix(input);
+    
+    Normalization n = new Normalization();
+
+    
+    NeuralNetwork brain = new NeuralNetwork();
+    brain.multiplyFeatures(n.normalize(matrix, Normalization.ZSKORE), weights, ActivationFuctions.SIGMOID);
+    
+    
+    
+   // brain.backpropagation(LossFunction, learingRate);
+    
+    brain.backpropagation(LossFunctions.MSE, 0.001);
+    
+    brain.totalErorr();
+   
+    
+    
+    }
+
+    
+}
